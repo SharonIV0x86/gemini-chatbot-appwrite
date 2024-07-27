@@ -14,7 +14,7 @@ export default async ({ req, res, log, error }) => {
     let result = await model.generateContent(prompt);
     let generation = result.response.text();
     log(generation);
-    res.json({
+    return res.json({
       result: generation
     });
   }
