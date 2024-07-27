@@ -1,33 +1,22 @@
 import { Client } from 'node-appwrite';
-
+import { GoogleGenerativeAI } from "@google/generative-ai"
 // This is your Appwrite function
 // It's executed each time we get a request
 export default async ({ req, res, log, error }) => {
-  // Why not try the Appwrite SDK?
-  //
-  // const client = new Client()
-  //    .setEndpoint('https://cloud.appwrite.io/v1')
-  //    .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
-  //    .setKey(process.env.APPWRITE_API_KEY);
 
-  // You can log messages to the console
-  log('Hello, Logs!');
 
-  // If something goes wrong, log an error
-  error('Hello, Errors!');
-
-  // The `req` object contains the request data
-  if (req.method === 'GET') {
-    // Send a response with the res object helpers
-    // `res.send()` dispatches a string back to the client
-    return res.send('Hello, World!');
+  let apiKey = process.env.GEMINI_API_KEY;
+  let gemini = new GoogleGenerativeAI(apiKey);
+  let model = gemini.getGenerativeModel({model: "gemini-1.5-flash"});
+  if (req.method === 'POST') {
+    let prompt = req.body.prompt;
+    log(prompt);
+    let result = await model.generateContent(prompt);
+    let generation = result.response.text();
+    log(generation);
+    res.json({
+      result: generation
+    });
   }
 
-  // `res.json()` is a handy helper for sending JSON
-  return res.json({
-    motto: 'Build like a team of hundreds_',
-    learn: 'https://appwrite.io/docs',
-    connect: 'https://appwrite.io/discord',
-    getInspired: 'https://builtwith.appwrite.io',
-  });
 };
